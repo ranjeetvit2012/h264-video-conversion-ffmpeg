@@ -18,23 +18,42 @@ const outputPath = path.join(__dirname, 'public', `output_${uuid}.mp4`);
 
 app.get('/', async (req, res) => {
   try {
+    
     // Download the video to a local file
     // Process the video file
     console.log('Processing video...');
-    
     ffmpeg(inputUrl)
-       .videoCodec('libx264')
-       .audioCodec('aac')   
-      .output(outputPath)
-      .on('end', () => {
-        console.log('Processing complete.');
-        res.send('Video processed successfully!');
-      })
-      .on('error', (err) => {
-        console.error('Error processing video:', err.message);
-        res.status(500).send('Error processing video.');
-      })
-      .run();
+            .outputOptions('-threads 6') // Limit to 2 threads
+            .videoCodec('libx264')
+            .output(outputPath)
+            .on('start', (commandLine) => {
+            console.log('FFmpeg process started with command: ' + commandLine);
+           
+            })
+            .on('progress', (progress) => {
+            console.log('Processing:  % done',progress);
+            })
+            .on('error', (err) => {
+            console.log('An error occurred: ' + err.message);
+            })
+            .on('end', () => {
+            console.log('Processing finished');
+            })
+            .run();
+    
+    // ffmpeg(inputUrl)
+    //    .videoCodec('libx264')
+    //    .audioCodec('aac')   
+    //   .output(outputPath)
+    //   .on('end', () => {
+    //     console.log('Processing complete.');
+    //     res.send('Video processed successfully!');
+    //   })
+    //   .on('error', (err) => {
+    //     console.error('Error processing video:', err.message);
+    //     res.status(500).send('Error processing video.');
+    //   })
+    //   .run();
   } catch (err) {
     console.error('Error:', err.message);
     res.status(500).send('Error during processing.');
