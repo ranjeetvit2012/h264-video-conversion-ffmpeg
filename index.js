@@ -21,37 +21,20 @@ app.get('/', async (req, res) => {
     // Download the video to a local file
     // Process the video file
     console.log('Processing video...');
+    
     ffmpeg(inputUrl)
-            .outputOptions('-threads 6') // Limit to 2 threads
-            .output(outputPath)
-            .on('start', (commandLine) => {
-            console.log('FFmpeg process started with command: ' + commandLine);
-           
-            })
-            .on('progress', (progress) => {
-            console.log('Processing:  % done',progress);
-            })
-            .on('error', (err) => {
-            console.log('An error occurred: ' + err.message);
-            })
-            .on('end', () => {
-            console.log('Processing finished');
-            resolve('complete');
-            })
-            .run();
-    // ffmpeg(inputUrl)
-    //    .videoCodec('libx264')
-    //    .audioCodec('aac')   
-    //   .output(outputPath)
-    //   .on('end', () => {
-    //     console.log('Processing complete.');
-    //     res.send('Video processed successfully!');
-    //   })
-    //   .on('error', (err) => {
-    //     console.error('Error processing video:', err.message);
-    //     res.status(500).send('Error processing video.');
-    //   })
-    //   .run();
+       .videoCodec('libx264')
+       .audioCodec('aac')   
+      .output(outputPath)
+      .on('end', () => {
+        console.log('Processing complete.');
+        res.send('Video processed successfully!');
+      })
+      .on('error', (err) => {
+        console.error('Error processing video:', err.message);
+        res.status(500).send('Error processing video.');
+      })
+      .run();
   } catch (err) {
     console.error('Error:', err.message);
     res.status(500).send('Error during processing.');
